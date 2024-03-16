@@ -29,9 +29,10 @@ Widget initialScreen() {
         // Check if the snapshot has any data (user is logged in)
         User? user = snapshot.data;
         if (user == null) {
-          return const LoginScreen(); // User not logged in, show login screen
+          return LoginScreen(); // User not logged in, show login screen
         }
-        return const HomePage(); // User is logged in, show home screen
+        return HomePage(
+            userId: user.uid); // User is logged in, show home screen
       }
       // Waiting for connection state to be active (add a loading indicator)
       return const Scaffold(
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: initialScreen(), 
+      home: initialScreen(),
     );
   }
 }

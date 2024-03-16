@@ -46,7 +46,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .collection("cataloglist")
             .doc("Example")
             .set({
-          'catalogName': "books",
+          'Name': "name of catalog",
+          'Description': "description of catalog",
         });
 
         return userCredential;
@@ -99,9 +100,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 UserCredential? userCredential = await createUser(
                     _emailController.text, _passwordController.text);
                 if (userCredential != null) {
-                  // Navigate to the home screen on successful signup
                   Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const HomePage()));
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          HomePage(userId: userCredential.user!.uid),
+                    ),
+                  );
                 }
               },
               child: Text('Sign Up'),

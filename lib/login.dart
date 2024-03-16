@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
@@ -39,8 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       print("User ID: ${userCredential.user?.uid}");
       // ignore: use_build_context_synchronously
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));
+      if (userCredential.user != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => HomePage(userId: userCredential.user!.uid),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       // You can show an alert dialog or a snackbar here
       print("Error: ${e.message}");
