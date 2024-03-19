@@ -1,5 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'add_item.dart'; // Make sure this is the correct import
 
 class DisplayCatalogContents extends StatefulWidget {
   final String catalogId;
@@ -15,7 +18,7 @@ class DisplayCatalogContents extends StatefulWidget {
 
 class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   final ScrollController _scrollController = ScrollController();
-  List<DocumentSnapshot> _catalogItems = [];
+  final List<DocumentSnapshot> _catalogItems = [];
   DocumentSnapshot? _lastDocument;
   bool _hasMoreItems = true;
   bool _isLoading = false;
@@ -56,7 +59,6 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
 
     try {
       var snapshot = await query.get();
-      print('Documents fetched: ${snapshot.docs.length}'); // Debug print
 
       if (snapshot.docs.length < _itemsPerPage) {
         _hasMoreItems = false;
@@ -70,7 +72,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
         _catalogItems.addAll(snapshot.docs);
       });
     } catch (e) {
-      print('Error fetching data: $e'); // Error handling
+      // print('Error fetching data: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -82,35 +84,51 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Catalog Contents'),
+        title: const Text('Catalog Contents'),
       ),
-      body: GridView.builder(
-        controller: _scrollController,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Adjust as needed
-          childAspectRatio: 1.0,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        padding: const EdgeInsets.all(8),
-        itemCount: _catalogItems.length,
-        itemBuilder: (context, index) {
-          Map<String, dynamic> data =
-              _catalogItems[index].data()! as Map<String, dynamic>;
-          return _buildGridTile(context, data);
-        },
+      body: _catalogItems.isEmpty && !_isLoading
+          ? const Center(
+              child: Text(
+                  'No items in the catalog. Add new items using the button below.'),
+            )
+          : GridView.builder(
+              controller: _scrollController,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              padding: const EdgeInsets.all(8),
+              itemCount: _catalogItems.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> data =
+                    _catalogItems[index].data()! as Map<String, dynamic>;
+                return _buildGridTile(context, data);
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _navigateToAddItemPage(context),
+        tooltip: 'Add New Item',
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _buildGridTile(BuildContext context, Map<String, dynamic> data) {
-    // Here, you would construct the grid tile.
-    // This is a basic placeholder, adjust it as per your item's data structure.
     return Card(
       child: ListTile(
-        title: Text(data['name'] ?? 'Unnamed Item'),
+        title: Text(data['itemName'] ?? 'Unnamed Item'),
         subtitle: Text(data['description'] ?? 'No description available'),
       ),
+    );
+  }
+
+  void _navigateToAddItemPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) =>
+              AddItem(catalogId: widget.catalogId, userId: widget.userId)),
     );
   }
 

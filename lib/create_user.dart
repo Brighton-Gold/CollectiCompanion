@@ -1,10 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
@@ -35,8 +40,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .collection("itemList")
             .doc("Example")
             .set({
-          'Name': "name of item",
-          'Description': "description of item",
+          'itemName': "name of item",
+          'description': "description of item",
+          'catalogId': 'Example'
         });
 
 // Then, set the document in 'cataloglist' sub-collection
@@ -46,25 +52,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .collection("cataloglist")
             .doc("Example")
             .set({
-          'Name': "name of catalog",
-          'Description': "description of catalog",
+          'catalogName': "Name of catalog",
+          'description':
+              "This is an example of what a catalog looks like, feel free to delete later!",
+          'catalogId': 'Example'
         });
 
         return userCredential;
       } else {
         // Show error if user creation failed
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('User creation failed')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User creation failed')));
         return null;
       }
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase Auth exceptions
       if (e.code == 'weak-password') {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('The password provided is too weak.')));
+            const SnackBar(content: Text('The password provided is too weak.')));
       } else if (e.code == 'email-already-in-use') {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('The email address is already in use.')));
+            const SnackBar(content: Text('The email address is already in use.')));
       }
       return null;
     } catch (e) {
@@ -79,20 +87,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             ElevatedButton(
@@ -108,7 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   );
                 }
               },
-              child: Text('Sign Up'),
+              child: const Text('Sign Up'),
             ),
           ],
         ),

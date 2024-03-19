@@ -35,9 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      print("User ID: ${userCredential.user?.uid}");
       // ignore: use_build_context_synchronously
       if (userCredential.user != null) {
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => HomePage(userId: userCredential.user!.uid),
@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 // Navigate to Sign Up Screen
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => SignUpScreen()));
+                    MaterialPageRoute(builder: (_) => const SignUpScreen()));
               },
               child: const Text("Don't have an account? Sign up"),
             ),
@@ -110,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+// ignore: camel_case_types
 class createUser {
   const createUser();
 }

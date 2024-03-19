@@ -29,7 +29,7 @@ Widget initialScreen() {
         // Check if the snapshot has any data (user is logged in)
         User? user = snapshot.data;
         if (user == null) {
-          return LoginScreen(); // User not logged in, show login screen
+          return const LoginScreen(); // User not logged in, show login screen
         }
         return HomePage(
             userId: user.uid); // User is logged in, show home screen

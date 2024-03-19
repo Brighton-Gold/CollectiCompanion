@@ -1,8 +1,10 @@
 // Start by importing the necessary packages
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'addCatalogScreen.dart'; // Make sure this is the correct import
+import 'add_catalog.dart'; // Make sure this is the correct import
 import 'display_catalog_contents.dart'; // Import the DisplayCatalogContents screen
 
 class CatalogList extends StatefulWidget {
@@ -16,7 +18,7 @@ class CatalogList extends StatefulWidget {
 
 class _CatalogListState extends State<CatalogList> {
   final ScrollController _scrollController = ScrollController();
-  List<DocumentSnapshot> _catalogItems = [];
+  final List<DocumentSnapshot> _catalogItems = [];
   DocumentSnapshot? _lastDocument;
   bool _hasMoreItems = true;
   bool _isLoading = false;
@@ -176,7 +178,7 @@ class _CatalogListState extends State<CatalogList> {
   Color _colorFromHex(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll('#', '');
     if (hexColor.length == 6) {
-      hexColor = 'FF' + hexColor; // Add alpha value if missing
+      hexColor = 'FF$hexColor'; // Add alpha value if missing
     }
     return Color(int.parse(hexColor, radix: 16));
   }

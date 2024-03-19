@@ -8,6 +8,7 @@ class AddCatalogScreen extends StatefulWidget {
   const AddCatalogScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddCatalogScreenState createState() => _AddCatalogScreenState();
 }
 
@@ -29,7 +30,7 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
           ),
         ],
       ),
-       body: Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -41,7 +42,8 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Catalog Description'),
+              decoration:
+                  const InputDecoration(labelText: 'Catalog Description'),
               keyboardType: TextInputType.multiline,
               maxLines: null, // Allows the input to expand to multiple lines
             ),
@@ -62,22 +64,30 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
   }
 
   void _saveCatalog() async {
-    String catalogId = FirebaseFirestore.instance.collection('users').doc().id;
-
-    // Convert color to HEX string (excluding alpha)
-    String colorString = '#${_selectedColor.value.toRadixString(16).substring(2)}';
-
-    await FirebaseFirestore.instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    // Get a new document reference with an auto-generated ID
+    DocumentReference catalogRef = firestore
         .collection('users')
         .doc(widget.userId)
         .collection('cataloglist')
-        .doc(catalogId)
-        .set({
+        .doc();
+
+    // Convert color to HEX string (excluding alpha)
+    String colorString =
+        '#${_selectedColor.value.toRadixString(16).substring(2)}';
+
+    // Use the document ID as the catalogId
+    String catalogId = catalogRef.id;
+
+    await catalogRef.set({
+      'catalogId': catalogId, // Add catalogId here
       'catalogName': _nameController.text,
       'color': colorString,
-      'discription': _descriptionController.text,
+      'description': _descriptionController.text,
       // 'imgbase64': // Implement photo functionality here if needed
     });
+
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
   }
 
