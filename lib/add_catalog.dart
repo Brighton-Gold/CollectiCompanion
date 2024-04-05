@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class AddCatalogScreen extends StatefulWidget {
   final String userId;
@@ -8,15 +11,14 @@ class AddCatalogScreen extends StatefulWidget {
   const AddCatalogScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddCatalogScreenState createState() => _AddCatalogScreenState();
 }
 
 class _AddCatalogScreenState extends State<AddCatalogScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-
   Color _selectedColor = Colors.white;
+  String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +44,9 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _descriptionController,
-              decoration:
-                  const InputDecoration(labelText: 'Catalog Description'),
+              decoration: const InputDecoration(labelText: 'Catalog Description'),
               keyboardType: TextInputType.multiline,
-              maxLines: null, // Allows the input to expand to multiple lines
+              maxLines: null,
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -53,42 +54,17 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
               child: const Text('Select Color'),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _uploadFile,
-              child: const Text('Upload Image (Placeholder)'),
+            IconButton(
+              onPressed: _pickAndUploadImage,
+              icon: const Icon(Icons.camera_alt),
             ),
+            imageUrl != null
+                ? Image.network(imageUrl!)
+                : Container(), // Displaying the uploaded image
           ],
         ),
       ),
     );
-  }
-
-  void _saveCatalog() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    // Get a new document reference with an auto-generated ID
-    DocumentReference catalogRef = firestore
-        .collection('users')
-        .doc(widget.userId)
-        .collection('cataloglist')
-        .doc();
-
-    // Convert color to HEX string (excluding alpha)
-    String colorString =
-        '#${_selectedColor.value.toRadixString(16).substring(2)}';
-
-    // Use the document ID as the catalogId
-    String catalogId = catalogRef.id;
-
-    await catalogRef.set({
-      'catalogId': catalogId, // Add catalogId here
-      'catalogName': _nameController.text,
-      'color': colorString,
-      'description': _descriptionController.text,
-      // 'imgbase64': // Implement photo functionality here if needed
-    });
-
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
   }
 
   void _selectColor() {
@@ -116,8 +92,47 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
     );
   }
 
-  void _uploadFile() {
-    // Placeholder for file upload logic
-    // Implement file upload functionality here
+  void _saveCatalog() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DocumentReference catalogRef = firestore
+        .collection('users')
+        .doc(widget.userId)
+        .collection('catalogList')
+        .doc();
+
+    String colorString =
+        '#${_selectedColor.value.toRadixString(16).substring(2)}';
+
+    await catalogRef.set({
+      'catalogId': catalogRef.id,
+      'catalogName': _nameController.text,
+      'description': _descriptionController.text,
+      'color': colorString,
+      'imageUrl': imageUrl, // Save the URL of the uploaded image
+    });
+
+    Navigator.pop(context);
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker imagePicker = ImagePicker();
+    final XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageRef = FirebaseStorage.instance.ref().child("images/$fileName");
+
+      try {
+        await storageRef.putFile(imageFile);
+        String downloadedUrl = await storageRef.getDownloadURL();
+        setState(() {
+          imageUrl = downloadedUrl;
+        });
+      } catch (e) {
+        // Handle errors in uploading
+      }
+    }
   }
 }

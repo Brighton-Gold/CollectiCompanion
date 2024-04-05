@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Home'),
       ),
-      body: CatalogList(userId: userId), // Your custom widget for the catalog list
+      body: CatalogList(userId: userId),
     );
   }
 }

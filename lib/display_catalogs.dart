@@ -1,11 +1,10 @@
-// Start by importing the necessary packages
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'add_catalog.dart'; // Make sure this is the correct import
-import 'display_catalog_contents.dart'; // Import the DisplayCatalogContents screen
+import 'add_catalog.dart';
+import 'display_catalog_contents.dart';
 
 class CatalogList extends StatefulWidget {
   final String userId;
@@ -49,7 +48,7 @@ class _CatalogListState extends State<CatalogList> {
     Query query = FirebaseFirestore.instance
         .collection('users')
         .doc(widget.userId)
-        .collection('cataloglist')
+        .collection('catalogList')
         .orderBy('catalogName') // Adjust the field name as needed
         .limit(_itemsPerPage);
 
@@ -113,8 +112,8 @@ class _CatalogListState extends State<CatalogList> {
     Widget imageWidget;
 
     // Check for base64 image
-    if (data['imgbase64'] != null && data['imgbase64'].toString().isNotEmpty) {
-      String base64String = data['imgbase64'];
+    if (data['imagebase64'] != null && data['imagebase64'].toString().isNotEmpty) {
+      String base64String = data['imagebase64'];
       if (base64String.startsWith('data:image')) {
         base64String = base64String.split(',')[1];
       }
@@ -135,12 +134,14 @@ class _CatalogListState extends State<CatalogList> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DisplayCatalogContents(
-                catalogId: data['catalogId'], userId: widget.userId),
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => DisplayCatalogContents(
+            catalogId: data['catalogId'],
+            userId: widget.userId,
+            catalogName: data['catalogName'],
+            description: data['description'],
           ),
-        );
+        ));
       },
       child: Card(
         elevation: 2,

@@ -61,11 +61,14 @@ class _AddItemState extends State<AddItem> {
           .collection('itemList')
           .doc();
 
+      String itemId = itemListRef.id;
+    
       // Use set to add a new document to itemList
       await itemListRef.set({
         'itemName': _nameController.text,
         'description': _descriptionController.text,
         'catalogId': widget.catalogId,
+        'itemId': itemId,
       });
 
       // Clearing the text fields after successful upload

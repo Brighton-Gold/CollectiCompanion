@@ -1,16 +1,22 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'add_item.dart'; // Make sure this is the correct import
+import 'add_item.dart';
+import 'display_item.dart';
+import 'edit_catalog.dart'; // Import the edit_catalog.dart file
 
 class DisplayCatalogContents extends StatefulWidget {
   final String catalogId;
   final String userId;
+  final String catalogName;
+  final String description;
 
-  const DisplayCatalogContents(
-      {Key? key, required this.catalogId, required this.userId})
-      : super(key: key);
+  const DisplayCatalogContents({
+    Key? key,
+    required this.catalogId,
+    required this.userId,
+    required this.catalogName,
+    required this.description,
+  }) : super(key: key);
 
   @override
   _DisplayCatalogContentsState createState() => _DisplayCatalogContentsState();
@@ -59,7 +65,6 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
 
     try {
       var snapshot = await query.get();
-
       if (snapshot.docs.length < _itemsPerPage) {
         _hasMoreItems = false;
       }
@@ -72,7 +77,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
         _catalogItems.addAll(snapshot.docs);
       });
     } catch (e) {
-      // print('Error fetching data: $e');
+      // Handle the error appropriately.
     } finally {
       setState(() {
         _isLoading = false;
@@ -84,7 +89,25 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Catalog Contents'),
+        title: Text(widget.catalogName),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditCatalog(
+                    catalogId: widget.catalogId,
+                    userId: widget.userId,
+                    catalogName: widget.catalogName,
+                    description: widget.description,
+                    
+                  ),
+                ),
+              );
+            },
+            icon: Icon(Icons.edit),
+          ),
+        ],
       ),
       body: _catalogItems.isEmpty && !_isLoading
           ? const Center(
@@ -102,9 +125,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
               padding: const EdgeInsets.all(8),
               itemCount: _catalogItems.length,
               itemBuilder: (context, index) {
-                Map<String, dynamic> data =
-                    _catalogItems[index].data()! as Map<String, dynamic>;
-                return _buildGridTile(context, data);
+                return _buildGridTile(context, _catalogItems[index]);
               },
             ),
       floatingActionButton: FloatingActionButton(
@@ -115,11 +136,25 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
     );
   }
 
-  Widget _buildGridTile(BuildContext context, Map<String, dynamic> data) {
-    return Card(
-      child: ListTile(
-        title: Text(data['itemName'] ?? 'Unnamed Item'),
-        subtitle: Text(data['description'] ?? 'No description available'),
+  Widget _buildGridTile(BuildContext context, DocumentSnapshot item) {
+    Map<String, dynamic> data = item.data() as Map<String, dynamic>;
+
+    return GestureDetector(
+      onTap: () => _navigateToDisplayItemPage(context, item.id),
+      child: Card(
+        child: ListTile(
+          title: Text(data['itemName'] ?? 'Unnamed Item'),
+          subtitle: Text(data['description'] ?? 'No description available'),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToDisplayItemPage(BuildContext context, String itemId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            DisplayItem(itemId: itemId, userId: widget.userId),
       ),
     );
   }
@@ -127,8 +162,9 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   void _navigateToAddItemPage(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-          builder: (context) =>
-              AddItem(catalogId: widget.catalogId, userId: widget.userId)),
+        builder: (context) =>
+            AddItem(catalogId: widget.catalogId, userId: widget.userId),
+      ),
     );
   }
 

@@ -45,7 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // You can show an alert dialog or a snackbar here
       print("Error: ${e.message}");
     }
   }
