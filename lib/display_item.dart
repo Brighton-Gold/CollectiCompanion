@@ -5,9 +5,14 @@ import 'package:my_app/edit_item.dart';
 class DisplayItem extends StatefulWidget {
   final String itemId;
   final String userId;
+  final Function onItemUpdated;
 
-  const DisplayItem({Key? key, required this.itemId, required this.userId})
-      : super(key: key);
+  const DisplayItem({
+    Key? key,
+    required this.itemId,
+    required this.userId,
+    required this.onItemUpdated,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -79,9 +84,8 @@ class _DisplayItemState extends State<DisplayItem> {
                     userId: widget.userId,
                     itemName: itemData['itemName'],
                     description: itemData['description'],
-                    onItemUpdated: refreshItemData,
+                    onItemUpdated: widget.onItemUpdated,
                   ),
-                  //builder: (context) => EditItem(itemId: widget.itemId),
                 ));
               },
               child: const Icon(Icons.edit),

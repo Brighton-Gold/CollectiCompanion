@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,14 +8,14 @@ class EditItem extends StatefulWidget {
   final String description;
   final Function onItemUpdated;
 
-  const EditItem(
-      {Key? key,
-      required this.itemId,
-      required this.userId,
-      required this.itemName,
-      required this.description,
-      required this.onItemUpdated})
-      : super(key: key);
+  const EditItem({
+    Key? key,
+    required this.itemId,
+    required this.userId,
+    required this.itemName,
+    required this.description,
+    required this.onItemUpdated,
+  }) : super(key: key);
 
   @override
   _EditItemState createState() => _EditItemState();
@@ -31,24 +29,30 @@ class _EditItemState extends State<EditItem> {
   @override
   void initState() {
     super.initState();
-    // Initialize the fields with the current item data
     _itemName = widget.itemName;
     _description = widget.description;
   }
 
   void _updateItemData() async {
     if (_formKey.currentState!.validate()) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.userId)
-          .collection('itemList')
-          .doc(widget.itemId)
-          .update({
-        'itemName': _itemName,
-        'description': _description,
-      });
-      widget.onItemUpdated();
-      Navigator.pop(context);
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.userId)
+            .collection('itemList')
+            .doc(widget.itemId)
+            .update({
+          'itemName': _itemName,
+          'description': _description,
+        });
+
+        widget.onItemUpdated();
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error updating item: $e")));
+      }
     }
   }
 
@@ -74,13 +78,21 @@ class _EditItemState extends State<EditItem> {
         });
 
     if (confirmDelete) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.userId)
-          .collection('itemList')
-          .doc(widget.itemId)
-          .delete();
-      Navigator.pop(context);
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.userId)
+            .collection('itemList')
+            .doc(widget.itemId)
+            .delete();
+
+        widget.onItemUpdated();
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error deleting item: $e")));
+      }
     }
   }
 

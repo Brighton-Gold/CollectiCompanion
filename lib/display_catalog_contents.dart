@@ -196,8 +196,10 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   void _navigateToDisplayItemPage(BuildContext context, String itemId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) =>
-            DisplayItem(itemId: itemId, userId: widget.userId),
+        builder: (context) => DisplayItem(
+            itemId: itemId,
+            userId: widget.userId,
+            onItemUpdated: refreshItemList),
       ),
     );
   }
