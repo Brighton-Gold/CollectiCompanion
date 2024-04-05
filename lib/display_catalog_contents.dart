@@ -199,19 +199,28 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
     );
   }
 
- void _navigateToAddItemPage(BuildContext context) {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (context) => AddItem(
-        catalogId: widget.catalogId, 
-        userId: widget.userId,
-        onItemAdded: refreshItemList,
+  void _navigateToAddItemPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddItem(
+          catalogId: widget.catalogId,
+          userId: widget.userId,
+          onItemAdded: refreshItemList,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void refreshItemList() {
+    setState(() {
+      _catalogItems.clear();
+      _lastDocument = null;
+      _hasMoreItems = true;
+      _loadItems();
+    });
+  }
+
+  void refreshCatalog() {
     setState(() {
       _catalogItems.clear();
       _lastDocument = null;

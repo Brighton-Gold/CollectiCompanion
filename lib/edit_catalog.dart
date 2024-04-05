@@ -87,6 +87,7 @@ class _EditCatalogState extends State<EditCatalog> {
             .doc(widget.catalogId)
             .delete();
         Navigator.pop(context);
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Catalog deleted successfully"),
         ));
