@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'display_catalogs.dart'; // Ensure this file contains the CatalogList widget
+import 'display_catalogs.dart'; 
+import 'search.dart'; // Ensure this import is present
 
 class HomePage extends StatelessWidget {
   final String userId;
@@ -11,8 +12,19 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // When this button is pressed, navigate to the SearchScreen
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => SearchScreen(userId: userId)),
+              );
+            },
+          ),
+        ],
       ),
-      body: CatalogList(userId: userId),
+      body: CatalogList(userId: userId), // Existing body
     );
   }
 }

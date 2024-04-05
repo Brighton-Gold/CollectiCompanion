@@ -2,15 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'login.dart'; // Import Login Screen
-import 'home.dart'; // Import Home Screen
+import 'login.dart';
+import 'home.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
       apiKey:
-          "AIzaSyBCwCnZfJsBlBbqee04V66_AoboLrEnXKA", // Replace with actual keys
+          "AIzaSyBCwCnZfJsBlBbqee04V66_AoboLrEnXKA", 
       authDomain: "collecticompanion.firebaseapp.com",
       projectId: "collecticompanion",
       storageBucket: "collecticompanion.appspot.com",
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'CollectiCompanion',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

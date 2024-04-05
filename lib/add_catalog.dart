@@ -1,4 +1,7 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -44,7 +47,8 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Catalog Description'),
+              decoration:
+                  const InputDecoration(labelText: 'Catalog Description'),
               keyboardType: TextInputType.multiline,
               maxLines: null,
             ),
@@ -54,10 +58,7 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
               child: const Text('Select Color'),
             ),
             const SizedBox(height: 10),
-            IconButton(
-              onPressed: _pickAndUploadImage,
-              icon: const Icon(Icons.camera_alt),
-            ),
+            _buildImagePicker(), // Use the _buildImagePicker function here
             imageUrl != null
                 ? Image.network(imageUrl!)
                 : Container(), // Displaying the uploaded image
@@ -114,15 +115,30 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
     Navigator.pop(context);
   }
 
+Widget _buildImagePicker() {
+  if (kIsWeb) {
+    // Web-specific UI
+    return IconButton(
+      onPressed: _pickAndUploadImage,
+      icon: const Icon(Icons.camera_alt),
+    );
+  } else {
+    // Mobile-specific or other platforms UI
+    return Container(); // Return an empty container for non-web platforms
+  }
+}
+
   Future<void> _pickAndUploadImage() async {
     final ImagePicker imagePicker = ImagePicker();
-    final XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await imagePicker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
 
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference storageRef = FirebaseStorage.instance.ref().child("images/$fileName");
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child("images/$fileName");
 
       try {
         await storageRef.putFile(imageFile);

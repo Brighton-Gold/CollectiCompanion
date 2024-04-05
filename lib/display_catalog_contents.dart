@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
 import 'add_item.dart';
 import 'display_item.dart';
-import 'edit_catalog.dart'; // Import the edit_catalog.dart file
+import 'edit_catalog.dart';
 
 class DisplayCatalogContents extends StatefulWidget {
   final String catalogId;
@@ -39,7 +40,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !_isLoading) {
       _loadItems();
     }
@@ -77,7 +78,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
         _catalogItems.addAll(snapshot.docs);
       });
     } catch (e) {
-      // Handle the error appropriately.
+      // Handle errors appropriately
     } finally {
       setState(() {
         _isLoading = false;
@@ -87,6 +88,13 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600
+        ? 2
+        : screenWidth < 900
+            ? 3
+            : 4;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.catalogName),
@@ -100,37 +108,30 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
                     userId: widget.userId,
                     catalogName: widget.catalogName,
                     description: widget.description,
-                    
                   ),
                 ),
               );
             },
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
           ),
         ],
       ),
-      body: _catalogItems.isEmpty && !_isLoading
-          ? const Center(
-              child: Text(
-                  'No items in the catalog. Add new items using the button below.'),
-            )
-          : GridView.builder(
-              controller: _scrollController,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.0,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              padding: const EdgeInsets.all(8),
-              itemCount: _catalogItems.length,
-              itemBuilder: (context, index) {
-                return _buildGridTile(context, _catalogItems[index]);
-              },
-            ),
+      body: GridView.builder(
+        controller: _scrollController,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        padding: const EdgeInsets.all(8),
+        itemCount: _catalogItems.length,
+        itemBuilder: (context, index) {
+          return _buildGridTile(context, _catalogItems[index]);
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddItemPage(context),
-        tooltip: 'Add New Item',
         child: const Icon(Icons.add),
       ),
     );
@@ -139,12 +140,49 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   Widget _buildGridTile(BuildContext context, DocumentSnapshot item) {
     Map<String, dynamic> data = item.data() as Map<String, dynamic>;
 
+    Widget imageWidget;
+    if (data['imagebase64'] != null && data['imagebase64'].toString().isNotEmpty) {
+      String base64String = data['imagebase64'];
+      if (base64String.startsWith('data:image')) {
+        base64String = base64String.split(',')[1];
+      }
+      imageWidget = Image.memory(base64Decode(base64String), fit: BoxFit.cover);
+    } else {
+      imageWidget = Container(color: Colors.grey); // Default placeholder
+    }
+
     return GestureDetector(
       onTap: () => _navigateToDisplayItemPage(context, item.id),
       child: Card(
-        child: ListTile(
-          title: Text(data['itemName'] ?? 'Unnamed Item'),
-          subtitle: Text(data['description'] ?? 'No description available'),
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                child: imageWidget,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(
+                data['itemName'] ?? 'Unnamed Item',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                data['description'] ?? 'No description available',
+                style: const TextStyle(color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -153,8 +191,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   void _navigateToDisplayItemPage(BuildContext context, String itemId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) =>
-            DisplayItem(itemId: itemId, userId: widget.userId),
+        builder: (context) => DisplayItem(itemId: itemId, userId: widget.userId),
       ),
     );
   }
@@ -162,8 +199,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   void _navigateToAddItemPage(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) =>
-            AddItem(catalogId: widget.catalogId, userId: widget.userId),
+        builder: (context) => AddItem(catalogId: widget.catalogId, userId: widget.userId),
       ),
     );
   }

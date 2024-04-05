@@ -6,8 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 class ImageUtil {
   static Future<String?> pickAndConvertImage() async {
     try {
-      final ImagePicker _picker = ImagePicker();
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
       if (image != null) {
         File file = File(image.path);
