@@ -40,7 +40,7 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !_isLoading) {
       _loadItems();
     }
@@ -141,7 +141,8 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
     Map<String, dynamic> data = item.data() as Map<String, dynamic>;
 
     Widget imageWidget;
-    if (data['imagebase64'] != null && data['imagebase64'].toString().isNotEmpty) {
+    if (data['imagebase64'] != null &&
+        data['imagebase64'].toString().isNotEmpty) {
       String base64String = data['imagebase64'];
       if (base64String.startsWith('data:image')) {
         base64String = base64String.split(',')[1];
@@ -161,7 +162,8 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
                 child: imageWidget,
               ),
             ),
@@ -191,17 +193,31 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
   void _navigateToDisplayItemPage(BuildContext context, String itemId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => DisplayItem(itemId: itemId, userId: widget.userId),
+        builder: (context) =>
+            DisplayItem(itemId: itemId, userId: widget.userId),
       ),
     );
   }
 
-  void _navigateToAddItemPage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AddItem(catalogId: widget.catalogId, userId: widget.userId),
+ void _navigateToAddItemPage(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => AddItem(
+        catalogId: widget.catalogId, 
+        userId: widget.userId,
+        onItemAdded: refreshItemList,
       ),
-    );
+    ),
+  );
+}
+
+  void refreshItemList() {
+    setState(() {
+      _catalogItems.clear();
+      _lastDocument = null;
+      _hasMoreItems = true;
+      _loadItems();
+    });
   }
 
   @override

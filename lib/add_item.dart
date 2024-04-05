@@ -4,8 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AddItem extends StatefulWidget {
   final String catalogId;
   final String userId;
+  final Function onItemAdded;
 
-  const AddItem({Key? key, required this.catalogId, required this.userId})
+  const AddItem(
+      {Key? key,
+      required this.catalogId,
+      required this.userId,
+      required this.onItemAdded})
       : super(key: key);
 
   @override
@@ -19,37 +24,43 @@ class _AddItemState extends State<AddItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Item to Catalog'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Item Name',
-              ),
+    return WillPopScope(
+        onWillPop: () async {
+          widget
+              .onItemAdded(); // Invoke the callback when back button is pressed
+          return true; // Allows the screen to be popped
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Add Item to Catalog'),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Item Name',
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                TextField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Item Description',
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _saveItem, // Connect the _saveItem method here
+                  child: const Text('Add Item'),
+                ),
+              ],
             ),
-            const SizedBox(height: 8.0),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Item Description',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _saveItem,  // Connect the _saveItem method here
-              child: const Text('Add Item'),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   void _saveItem() async {
@@ -62,7 +73,7 @@ class _AddItemState extends State<AddItem> {
           .doc();
 
       String itemId = itemListRef.id;
-    
+
       // Use set to add a new document to itemList
       await itemListRef.set({
         'itemName': _nameController.text,
