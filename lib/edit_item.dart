@@ -8,13 +8,15 @@ class EditItem extends StatefulWidget {
   final String userId;
   final String itemName;
   final String description;
+  final Function onItemUpdated;
 
   const EditItem(
       {Key? key,
       required this.itemId,
       required this.userId,
       required this.itemName,
-      required this.description})
+      required this.description,
+      required this.onItemUpdated})
       : super(key: key);
 
   @override
@@ -45,6 +47,7 @@ class _EditItemState extends State<EditItem> {
         'itemName': _itemName,
         'description': _description,
       });
+      widget.onItemUpdated();
       Navigator.pop(context);
     }
   }

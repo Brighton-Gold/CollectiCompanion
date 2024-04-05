@@ -32,6 +32,12 @@ class _DisplayItemState extends State<DisplayItem> {
         .get();
   }
 
+  void refreshItemData() {
+    setState(() {
+      _itemData = _fetchItemData(); // Re-fetch the item data
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -55,9 +61,12 @@ class _DisplayItemState extends State<DisplayItem> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Item Name: ${itemData['itemName']}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('Item Name: ${itemData['itemName']}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text('Description: ${itemData['description']}', style: const TextStyle(fontSize: 18)),
+                  Text('Description: ${itemData['description']}',
+                      style: const TextStyle(fontSize: 18)),
                   // Add more fields as necessary
                 ],
               ),
@@ -65,7 +74,13 @@ class _DisplayItemState extends State<DisplayItem> {
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder : (context) => EditItem(itemId: widget.itemId, userId: widget.userId, itemName: itemData['itemName'], description: itemData['description']),
+                  builder: (context) => EditItem(
+                    itemId: widget.itemId,
+                    userId: widget.userId,
+                    itemName: itemData['itemName'],
+                    description: itemData['description'],
+                    onItemUpdated: refreshItemData,
+                  ),
                   //builder: (context) => EditItem(itemId: widget.itemId),
                 ));
               },
