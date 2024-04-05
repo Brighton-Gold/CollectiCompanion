@@ -30,6 +30,15 @@ class _CatalogListState extends State<CatalogList> {
     _scrollController.addListener(_scrollListener);
   }
 
+  void refreshCatalogList() {
+    setState(() {
+      _catalogItems.clear();
+      _lastDocument = null;
+      _hasMoreItems = true;
+      _loadItems();
+    });
+  }
+
   void _scrollListener() {
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
@@ -49,7 +58,7 @@ class _CatalogListState extends State<CatalogList> {
         .collection('users')
         .doc(widget.userId)
         .collection('catalogList')
-        .orderBy('catalogName') 
+        .orderBy('catalogName')
         .limit(_itemsPerPage);
 
     if (_lastDocument != null) {
@@ -84,7 +93,10 @@ class _CatalogListState extends State<CatalogList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AddCatalogScreen(userId: widget.userId),
+            builder: (context) => AddCatalogScreen(
+              userId: widget.userId,
+              onCatalogAdded: refreshCatalogList,
+            ),
           ),
         ),
         child: const Icon(Icons.add),
@@ -112,7 +124,8 @@ class _CatalogListState extends State<CatalogList> {
     Widget imageWidget;
 
     // Check for base64 image
-    if (data['imagebase64'] != null && data['imagebase64'].toString().isNotEmpty) {
+    if (data['imagebase64'] != null &&
+        data['imagebase64'].toString().isNotEmpty) {
       String base64String = data['imagebase64'];
       if (base64String.startsWith('data:image')) {
         base64String = base64String.split(',')[1];

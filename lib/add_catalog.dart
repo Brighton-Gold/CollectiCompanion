@@ -10,8 +10,11 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class AddCatalogScreen extends StatefulWidget {
   final String userId;
+  final Function onCatalogAdded;
 
-  const AddCatalogScreen({Key? key, required this.userId}) : super(key: key);
+  const AddCatalogScreen(
+      {Key? key, required this.userId, required this.onCatalogAdded})
+      : super(key: key);
 
   @override
   _AddCatalogScreenState createState() => _AddCatalogScreenState();
@@ -112,21 +115,22 @@ class _AddCatalogScreenState extends State<AddCatalogScreen> {
       'imageUrl': imageUrl, // Save the URL of the uploaded image
     });
 
+    widget.onCatalogAdded(); // Invoke the callback here
     Navigator.pop(context);
   }
 
-Widget _buildImagePicker() {
-  if (kIsWeb) {
-    // Web-specific UI
-    return IconButton(
-      onPressed: _pickAndUploadImage,
-      icon: const Icon(Icons.camera_alt),
-    );
-  } else {
-    // Mobile-specific or other platforms UI
-    return Container(); // Return an empty container for non-web platforms
+  Widget _buildImagePicker() {
+    if (kIsWeb) {
+      // Web-specific UI
+      return IconButton(
+        onPressed: _pickAndUploadImage,
+        icon: const Icon(Icons.camera_alt),
+      );
+    } else {
+      // Mobile-specific or other platforms UI
+      return Container(); // Return an empty container for non-web platforms
+    }
   }
-}
 
   Future<void> _pickAndUploadImage() async {
     final ImagePicker imagePicker = ImagePicker();
