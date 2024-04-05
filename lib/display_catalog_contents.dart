@@ -10,6 +10,8 @@ class DisplayCatalogContents extends StatefulWidget {
   final String userId;
   final String catalogName;
   final String description;
+  //function to display catalog contents
+  final Function displayCatalogContents;
 
   const DisplayCatalogContents({
     Key? key,
@@ -17,6 +19,7 @@ class DisplayCatalogContents extends StatefulWidget {
     required this.userId,
     required this.catalogName,
     required this.description,
+    required this.displayCatalogContents,
   }) : super(key: key);
 
   @override
@@ -104,11 +107,11 @@ class _DisplayCatalogContentsState extends State<DisplayCatalogContents> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => EditCatalog(
-                    catalogId: widget.catalogId,
-                    userId: widget.userId,
-                    catalogName: widget.catalogName,
-                    description: widget.description,
-                  ),
+                      catalogId: widget.catalogId,
+                      userId: widget.userId,
+                      catalogName: widget.catalogName,
+                      description: widget.description,
+                      onCatalogUpdated: widget.displayCatalogContents),
                 ),
               );
             },

@@ -153,6 +153,7 @@ class _CatalogListState extends State<CatalogList> {
             userId: widget.userId,
             catalogName: data['catalogName'],
             description: data['description'],
+            displayCatalogContents: refreshCatalogList,
           ),
         ));
       },

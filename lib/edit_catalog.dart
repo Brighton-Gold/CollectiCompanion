@@ -8,6 +8,7 @@ class EditCatalog extends StatefulWidget {
   final String userId;
   final String catalogName;
   final String description;
+  final Function onCatalogUpdated;
 
   const EditCatalog({
     Key? key,
@@ -15,6 +16,7 @@ class EditCatalog extends StatefulWidget {
     required this.userId,
     required this.catalogName,
     required this.description,
+    required this.onCatalogUpdated,
   }) : super(key: key);
 
   @override
@@ -86,8 +88,9 @@ class _EditCatalogState extends State<EditCatalog> {
             .collection('catalogList')
             .doc(widget.catalogId)
             .delete();
-        Navigator.pop(context);
-        Navigator.pop(context);
+        widget.onCatalogUpdated();
+        Navigator.popUntil(context, ModalRoute.withName('/'));
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Catalog deleted successfully"),
         ));
